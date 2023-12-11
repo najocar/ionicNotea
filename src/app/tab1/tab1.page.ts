@@ -1,12 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { LoadingController } from '@ionic/angular/standalone';
-import { IonicModule  } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Note } from '../model/note';
 import { NoteService } from '../services/note.service';
 import { UIService } from '../services/ui.service';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { compass, image, star } from 'ionicons/icons'
+import { addIcons,  } from 'ionicons';
 
 @Component({
   selector: 'app-tab1',
@@ -25,6 +27,7 @@ export class Tab1Page {
 
 
   constructor() {
+    addIcons({star, image, compass})
     this.form = this.formB.group({
       title: ['', [Validators.required, Validators.minLength(4)]],
       description: ['']

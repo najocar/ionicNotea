@@ -22,21 +22,22 @@ export class UIService {
       }
     })
   }
-  
+
   async hideLoading(): Promise<void>{
     if(!this.loadingElement) return;
     await this.loadingElement.dismiss();
     this.loadingElement=undefined;
   }
 
-  async showToast(msg:string, color:string="primary", duration:number = 3000, 
+  async showToast(msg:string, color:string="primary", duration:number = 3000,
     position: "top" | "bottom" | "middle" = "bottom",):Promise<void>{
     let toast:HTMLIonToastElement = await this.toastC.create({
       message:msg,
       duration:duration,
       position:position,
       color:color,
-      translucent:true
+      translucent:true,
+      positionAnchor:"footerTab"
     });
     toast.present();
   }
