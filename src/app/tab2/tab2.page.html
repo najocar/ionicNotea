@@ -7,6 +7,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  @defer (when this.notesList; on timer(1s)) {
   @for (note of this.noteS.notes$ | async; track $index) {
   <ion-list #lista>
     <ion-item-sliding (ionSwipe)="onItemSlide($event, note)">
@@ -16,10 +17,11 @@
         </ion-item-option>
       </ion-item-options>
 
-      <ion-item>
+      <ion-item (click)="viewNote(note)">
         <ion-label>{{note.title}}</ion-label>
         <p>{{note.description}}</p>
       </ion-item>
+
 
       <ion-item-options side="end">
         <ion-item-option color="danger" expandable="true">
@@ -29,7 +31,8 @@
     </ion-item-sliding>
   </ion-list>
   }
-
-  
+  } @placeholder (minimum 1000ms) {
+  <ion-spinner name="dots"></ion-spinner>
+  }
 
 </ion-content>

@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title>
@@ -9,10 +11,7 @@
 <ion-content [fullscreen]="true">
   <form [formGroup]="form" (ngSubmit)="saveNote()">
     <ion-item>
-      <ion-label>
-        Title
-      </ion-label>
-      <ion-input type="text" formControlName="title"></ion-input>
+      <ion-input label="Title" type="text" formControlName="title"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label>
@@ -28,12 +27,12 @@
 
       <ion-modal [keepContentsMounted]="true">
         <ng-template>
-          <ion-datetime id="datetime"></ion-datetime>
+          <ion-datetime id="datetime" formControlName="datePicker"></ion-datetime>
         </ng-template>
       </ion-modal>
     </ion-item>
     <ion-toolbar>
-      <ion-button slot="start">
+      <ion-button slot="start" (click)="printCurrentPosition()">
         <ion-icon slot="icon-only" name="compass"></ion-icon>
       </ion-button>
       <ion-button slot="end" (click)="takePick()">
@@ -42,4 +41,12 @@
     </ion-toolbar>
     <ion-button type="submit" expand="full" [disabled]="!form.valid">Submit</ion-button>
   </form>
+
+  @if (this.imageElement !== '') {
+  <img [src]="'data:image/jpg;base64,' + this.imageElement">
+  }
+
+  <div id="map"></div>
+
+
 </ion-content>

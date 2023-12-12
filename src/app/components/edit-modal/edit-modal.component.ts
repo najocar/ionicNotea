@@ -27,6 +27,7 @@ export class EditModalComponent {
   constructor(private modalCtrl: ModalController) { }
   
   ngOnInit(){
+  
     this.form = this.formB.group({
       title: [this.nota.title],
       description: [this.nota.description]

@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">volver</ion-button>
+    </ion-buttons>
+    <ion-title>{{this.nota.title}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <h1>Título: {{this.nota.title}}</h1>
+  <p>Descripción: {{this.nota.description}}</p>
+  <p>Fecha: {{this.nota.date}}</p>
+
+  @if (this.nota.img && this.nota.img !== '') {
+  <img [src]="'data:image/jpg;base64,' + this.nota.img">
+  }
+
+</ion-content>
