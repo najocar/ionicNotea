@@ -9,7 +9,7 @@ import { UIService } from '../services/ui.service';
 import { Camera, CameraResultType } from '@capacitor/camera';
 import { compass, image, star } from 'ionicons/icons'
 import { addIcons, } from 'ionicons';
-import { Geolocation } from '@capacitor/geolocation';
+import { Geolocation, Position } from '@capacitor/geolocation';
 import * as L from 'leaflet';
 import { icon } from 'leaflet';
 
@@ -29,6 +29,7 @@ export class Tab1Page {
   private myLoading!: HTMLIonLoadingElement;
 
   public imageElement: string = '';
+  public position: number[] = [];
 
   constructor() {
     addIcons({ star, image, compass })
@@ -48,6 +49,8 @@ export class Tab1Page {
       img: this.imageElement,
     }
 
+    console.log(this.imageElement);
+
     await this.UIS.showLoading();
 
     try {
@@ -63,7 +66,7 @@ export class Tab1Page {
 
   public takePick = async () => {
     const image = await Camera.getPhoto({
-      quality: 90,
+      quality: 50,
       allowEditing: true,
       resultType: CameraResultType.Base64
     })
@@ -76,16 +79,23 @@ export class Tab1Page {
   private resetForm() {
     this.form.reset();
     this.imageElement = '';
-    this.form = this.formB.group({
-      datePicker: [new Date(Date.now()).toISOString()]
-    });
+    this.position = [];
+    console.log(this.position);
+
+    this.form.addControl('datePicker', new Date(Date.now()).toISOString());
   }
 
   public printCurrentPosition = async () => {
     const coordinates = (await Geolocation.getCurrentPosition()).coords;
+    this.position = [coordinates.latitude, coordinates.longitude];
 
-    let map = L.map('map').setView([coordinates.latitude, coordinates.longitude], 13);
-    console.log('Current position:', coordinates);
+    console.log('Current position:', this.position[1]);
+
+
+    console.log('Current position:');
+
+
+    let map = L.map('map').setView([this.position[0], this.position[1]], 13);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -93,6 +103,8 @@ export class Tab1Page {
     }).addTo(map);
 
     let marker = L.marker([coordinates.latitude, coordinates.longitude]).addTo(map);
+
+
   };
 
 
