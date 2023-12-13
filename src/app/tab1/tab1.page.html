@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <form [formGroup]="form" (ngSubmit)="saveNote()">
     <ion-item>
       <ion-input label="Title" type="text" formControlName="title"></ion-input>

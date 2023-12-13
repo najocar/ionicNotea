@@ -47,6 +47,7 @@ export class Tab1Page {
       description: this.form.get("description")?.value,
       date: this.form.get("datePicker")?.value,
       img: this.imageElement,
+      position: this.position,
     }
 
     console.log(this.imageElement);
@@ -92,17 +93,16 @@ export class Tab1Page {
     console.log('Current position:', this.position[1]);
 
 
-    console.log('Current position:');
+    // console.log('Current position:');
+    setTimeout(() =>{
+      let map = L.map('map').setView([this.position[0], this.position[1]], 13);
 
-
-    let map = L.map('map').setView([this.position[0], this.position[1]], 13);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    let marker = L.marker([coordinates.latitude, coordinates.longitude]).addTo(map);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(map);
+  
+      let marker = L.marker([coordinates.latitude, coordinates.longitude]).addTo(map);
+    },100)
 
 
   };
