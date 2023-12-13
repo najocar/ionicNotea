@@ -48,7 +48,7 @@ export class NoteModalComponent  implements OnInit {
   }
 
   async openModal(modalSet:any) {
-    this.UIS.openModal(this.nota, modalSet);
+    this.UIS.openModal(this.paramSend, modalSet);
   }
 
 }
