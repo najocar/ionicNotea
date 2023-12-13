@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">volver</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  @if (this.nota.img && this.nota.img !== '') {
+  <img [src]="'data:image/jpg;base64,' + this.nota.img">
+  }
+
+  @if (this.nota.position && this.nota.position[1]) {
+    <div id="map"></div>
+  }
+
+</ion-content>

@@ -75,19 +75,6 @@ export class Tab2Page implements OnDestroy {
     this.lista.closeSlidingItems();
   }
 
-  // async openModal(note: Note, modalSet:any) {
-  //   const modal = await this.modalController.create({
-  //     component: EditModalComponent,
-  //     componentProps: {
-  //       // Puedes pasar propiedades al modal si es necesario
-  //       nota: note
-  //     },
-  //     cssClass: 'editModal',
-  //   });
-  //   this.lista.closeSlidingItems();
-  //   await modal.present();
-  // }
-
   viewNote(note:Note){
     this.openModal(note, NoteModalComponent);
   }

@@ -79,4 +79,17 @@ export class UIService {
     });
     await modal.present();
   }
+
+  async openModalparam(param: any, type:string, modalSet:any) {
+    const modal = await this.modalController.create({
+      component: modalSet,
+      componentProps: {
+        // Puedes pasar propiedades al modal si es necesario
+        param: param,
+        type: type
+      },
+      cssClass: 'editModal',
+    });
+    await modal.present();
+  }
 }

@@ -10,10 +10,15 @@
 
   <h1>Título: {{this.nota.title}}</h1>
   <p>Descripción: {{this.nota.description}}</p>
-  <p>Fecha: {{this.nota.date}}</p>
+  <ion-datetime value="{{this.nota.date}}" disabled="true" style="margin: auto;"></ion-datetime>
 
   @if (this.nota.img && this.nota.img !== '') {
-  <img [src]="'data:image/jpg;base64,' + this.nota.img">
+    <ion-button fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
+  <!-- <img [src]="'data:image/jpg;base64,' + this.nota.img"> -->
+  }
+
+  @if (this.nota.position && this.nota.position[1]) {
+    <ion-button fill="outline" (click)="sendLoc()">Ver Ubicación</ion-button>
   }
 
 </ion-content>
