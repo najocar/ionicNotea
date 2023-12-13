@@ -89,11 +89,6 @@ export class Tab1Page {
     const coordinates = (await Geolocation.getCurrentPosition()).coords;
     this.position = [coordinates.latitude, coordinates.longitude];
 
-    console.log('Current position:', this.position[1]);
-
-
-    console.log('Current position:');
-
 
     let map = L.map('map').setView([this.position[0], this.position[1]], 13);
 
