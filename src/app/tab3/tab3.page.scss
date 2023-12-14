@@ -1,12 +1,12 @@
-// ion-card {
-//     --background: #000;
-//     --color: #9efff0;
-//   }
-  
-//   ion-card-title {
-//     --color: #00ff48;
-//   }
-  
-//   ion-card-subtitle {
-//     --color: #d1fff8;
-//   }
+.container {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    --color: rgba(114, 114, 114, 0.3);
+    background-color: --ion-background-color;
+    background-image: linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%,transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%,transparent),
+        linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%,transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%,transparent);
+    background-size: 75px 75px;
+  }
