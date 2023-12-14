@@ -1,38 +1,71 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 2
+      Agregar nota
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  @defer (when this.notesList; on timer(1s)) {
-  @for (note of this.noteS.notes$ | async; track $index) {
-  <ion-list #lista>
-    <ion-item-sliding (ionSwipe)="onItemSlide($event, note)">
-      <ion-item-options side="start">
-        <ion-item-option color="primary" expandable="true" id="open-modal">
-          <ion-icon slot="icon-only" src="assets/icons/create.svg" (click)="editNote()"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <form [formGroup]="form" (ngSubmit)="saveNote()">
+    <ion-item>
+      <ion-input label="Título" type="text" formControlName="title"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-textarea label="Descripción" formControlName="description"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        Date
+      </ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
 
-      <ion-item (click)="viewNote(note)">
-        <ion-label>{{note.title}}</ion-label>
-        <p>{{note.description}}</p>
-      </ion-item>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime id="datetime" formControlName="datePicker"></ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+    <ion-toolbar>
+      <ion-button slot="start" (click)="printCurrentPosition()">
+        <ion-icon slot="icon-only" name="compass"></ion-icon>
+        Ubicación
+      </ion-button>
+      <ion-button slot="end" (click)="takePick()">
+        <ion-icon slot="icon-only" name="image"></ion-icon>
+        Imagen
+      </ion-button>
+    </ion-toolbar>
+    <ion-button type="submit" expand="full" [disabled]="!form.valid">Enviar</ion-button>
 
+    @if (this.imageElement !== '') {
+    <ion-button class="paramButton" fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
+    <ion-button class="paramButton" fill="outline" (click)="removeImg()" color="danger">borrar</ion-button>
+    }
 
-      <ion-item-options side="end">
-        <ion-item-option color="danger" expandable="true">
-          <ion-icon slot="icon-only" src="assets/icons/trash.svg" (click)="deleteNote(note)"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
-  }
-  } @placeholder (minimum 1000ms) {
-  <ion-spinner name="dots"></ion-spinner>
-  }
+    @if(this.position[1]) {
+      <ion-button class="paramButton" fill="outline" (click)="sendLoc()">Ver Ubicación</ion-button>
+      <ion-button class="paramButton" fill="outline" (click)="removeLoc()" color="danger">borrar</ion-button>
+    }
+
+    <!-- <ion-fab slot="fixed" vertical="bottom" horizontal="end" style="bottom: 80px;">
+      <ion-fab-button>
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-list side="top">
+        <ion-fab-button>
+          <ion-icon name="compass"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-button>
+          <ion-icon name="image"></ion-icon>
+        </ion-fab-button>
+      </ion-fab-list>
+    </ion-fab> -->
+
+  </form>
+
 
 </ion-content>

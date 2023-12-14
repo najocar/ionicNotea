@@ -7,6 +7,7 @@ import { LoadingController } from '@ionic/angular/standalone';
 import { Note } from 'src/app/model/note';
 import { NoteService } from 'src/app/services/note.service';
 import { UIService } from 'src/app/services/ui.service';
+import { ParamModalComponent } from '../param-modal/param-modal.component';
 
 @Component({
   selector: 'app-edit-modal',
@@ -23,6 +24,8 @@ export class EditModalComponent {
   public loadingS = inject(LoadingController);
 
   @Input() nota!: Note;
+
+  public paramSend!:Note;
 
   constructor(private modalCtrl: ModalController) { }
   
@@ -61,6 +64,36 @@ export class EditModalComponent {
     }finally{
       await this.UIS.hideLoading();
     }
+  }
+
+  sendImg(){
+    this.paramSend = {
+      title: this.form.get("title")?.value,
+      date: this.form.get("description")?.value,
+      img: this.nota.img,
+    }
+    this.openModal(ParamModalComponent)
+  }
+
+  sendLoc(){
+    this.paramSend = {
+      title: this.form.get("title")?.value,
+      date: this.form.get("description")?.value,
+      position: this.nota.position,
+    }
+    this.openModal(ParamModalComponent)
+  }
+
+  removeImg(){
+    this.nota.img = '';
+  }
+
+  removeLoc(){
+    this.nota.position = [];
+  }
+
+  async openModal(modalSet:any) {
+    this.UIS.openModal(this.paramSend, modalSet);
   }
 
 }

@@ -1,111 +1,136 @@
-import { Component, inject } from '@angular/core';
-import { LoadingController } from '@ionic/angular/standalone';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Note } from '../model/note';
 import { NoteService } from '../services/note.service';
+import { CommonModule } from '@angular/common';
+import { IonList, IonicModule, Platform } from '@ionic/angular';
+import { Note } from '../model/note';
+import { ModalController } from '@ionic/angular';
+import { EditModalComponent } from '../components/edit-modal/edit-modal.component';
 import { UIService } from '../services/ui.service';
-import { Camera, CameraResultType } from '@capacitor/camera';
-import { compass, image, star } from 'ionicons/icons'
-import { addIcons, } from 'ionicons';
-import { Geolocation, Position } from '@capacitor/geolocation';
-import * as L from 'leaflet';
-import { icon } from 'leaflet';
+import { BehaviorSubject, Observable, Subscription, from, map, mergeMap, tap, toArray } from 'rxjs';
+import { NoteModalComponent } from '../components/note-modal/note-modal.component';
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: true,
-  imports: [ExploreContainerComponent, FormsModule, ReactiveFormsModule, IonicModule],
+  imports: [IonicModule, ExploreContainerComponent, CommonModule]
 })
-export class Tab1Page {
-  public form!: FormGroup;
-  private formB = inject(FormBuilder)
-  private noteS = inject(NoteService);
+export class Tab1Page implements OnDestroy {
+  public noteS = inject(NoteService);
+  public modalController = inject(ModalController);
   private UIS = inject(UIService);
-  public loadingS = inject(LoadingController);
-  private myLoading!: HTMLIonLoadingElement;
+  private suscription!:Subscription;
 
-  public imageElement: string = '';
-  public position: number[] = [];
+  public notesList:Note[] = [];
+  public _notes$:BehaviorSubject<Note[]> = new BehaviorSubject<Note[]>([]);
+  private lastNote:Note|undefined=undefined;
+  private notesPerPage:number = 12;
+  public isInfiniteScrollAvailable:boolean = true;
 
-  constructor() {
-    addIcons({ star, image, compass })
-    this.form = this.formB.group({
-      title: ['', [Validators.required, Validators.minLength(4)]],
-      description: [''],
-      datePicker: [new Date(Date.now()).toISOString()]
+  @ViewChild('lista') lista!: IonList;
+
+  constructor(public platform:Platform) { }
+
+  ionViewDidEnter() {
+    this.suscription = this.noteS.readAll().subscribe(value => {
+      if(value){
+        this.notesList = value
+      }  
+    })
+    this.isInfiniteScrollAvailable = true;
+    this.platform.ready().then(() => {
+      this.notesPerPage=Math.round(this.platform.height()/50);
+      this.loadNotes(true);
     });
   }
 
-  public async saveNote(): Promise<void> {
-    if (!this.form.valid) return;
-    let note: Note = {
-      title: this.form.get("title")?.value,
-      description: this.form.get("description")?.value,
-      date: this.form.get("datePicker")?.value,
-      img: this.imageElement,
-      position: this.position,
-    }
-
-    console.log(this.imageElement);
-
-    await this.UIS.showLoading();
-
-    try {
-      await this.noteS.addNote(note);
-      this.resetForm();
-      await this.UIS.showToast("Nota introducida correctamente", "success");
-    } catch (error) {
-      await this.UIS.showToast("Error al insertar la nota", "danger");
-    } finally {
-      await this.UIS.hideLoading();
-    }
+  ngOnDestroy(){
+    this.suscription.unsubscribe();
   }
 
-  public takePick = async () => {
-    const image = await Camera.getPhoto({
-      quality: 50,
-      allowEditing: true,
-      resultType: CameraResultType.Base64
-    })
+  editNote() {
 
-    if (image.base64String) {
-      this.imageElement = image.base64String;
-    }
   }
 
-  private resetForm() {
-    this.form.reset();
-    this.imageElement = '';
-    this.position = [];
-    console.log(this.position);
-
-    this.form.addControl('datePicker', new Date(Date.now()).toISOString());
-  }
-
-  public printCurrentPosition = async () => {
-    const coordinates = (await Geolocation.getCurrentPosition()).coords;
-    this.position = [coordinates.latitude, coordinates.longitude];
-
-    console.log('Current position:', this.position[1]);
-
-
-    // console.log('Current position:');
-    setTimeout(() =>{
-      let map = L.map('map').setView([this.position[0], this.position[1]], 13);
-
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-      }).addTo(map);
+  async deleteNote(note: Note) {
+    if(await this.UIS.confirmation()==='confirm'){
+      try {
+        this.noteS.deleteNote(note);
+        this.lista.closeSlidingItems();
+      } catch {
   
-      let marker = L.marker([coordinates.latitude, coordinates.longitude]).addTo(map);
-    },100)
+      }
+    }else{
+      this.lista.closeSlidingItems();
+    }
+    
+  }
 
+  onItemSlide(event: any, note: Note) {
+    const swipeDirection = event.detail.side;
 
-  };
+    if (swipeDirection === "start") {
+      this.openModal(note, EditModalComponent);
+      // this.editNote();
+    } else if (swipeDirection === "end") {
+      this.deleteNote(note);
+    }
+  }
 
+  async openModal(note: Note, modalSet:any) {
+    this.UIS.openModal(note, modalSet);
+    this.lista.closeSlidingItems();
+  }
 
+  viewNote(note:Note){
+    this.openModal(note, NoteModalComponent);
+  }
+
+  handleRefresh(event:any) {
+    this.isInfiniteScrollAvailable=true;
+    this.lastNote=undefined;
+    this.loadNotes(true,event);
+  }
+
+  private convertPromiseToObservableFromFirebase(promise: Promise<any>): Observable<Note[]> {
+    return from(promise).pipe(
+      tap(d=>{
+        
+        if(d.docs && d.docs.length>=this.notesPerPage){
+          this.lastNote=d.docs[d.docs.length-1];
+        }else{
+          this.lastNote=undefined;
+        }
+      }),
+      mergeMap(d =>  d.docs),
+      map(d => {
+        return {key:(d as any).id,...(d as any).data()};
+      }),
+      toArray()
+    );
+  }
+
+  loadNotes(fromFirst:boolean, event?:any){
+    if(fromFirst==false && this.lastNote==undefined){
+      this.isInfiniteScrollAvailable=false;
+      event.target.complete();
+      return;
+    } 
+    
+    this.convertPromiseToObservableFromFirebase(this.noteS.readNext(this.lastNote,this.notesPerPage)).subscribe(d=>{
+      event?.target.complete();
+      if(fromFirst){
+        this._notes$.next(d);
+      }else{
+        this._notes$.next([...this._notes$.getValue(),...d]);
+      }
+    })
+    
+  }
+
+  loadMore(event: any) {
+    this.loadNotes(false,event);
+  }
 }

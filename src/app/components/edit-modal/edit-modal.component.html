@@ -9,16 +9,27 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding">
   <form [formGroup]="form" (ngSubmit)="confirm()">
     @if(nota){
-      <ion-item>
-        <ion-input #title placeholder="Title" type="text" formControlName="title" value="{{nota.title}}"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-textarea #description placeholder="Description" formControlName="description" value="{{nota.description}}"></ion-textarea>
-      </ion-item>
+    <ion-item>
+      <ion-input #title placeholder="Title" type="text" formControlName="title" value="{{nota.title}}"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-textarea #description placeholder="Description" formControlName="description"
+        value="{{nota.description}}"></ion-textarea>
+    </ion-item>
+
+    @if (this.nota.img && this.nota.img !== '') {
+    <ion-button class="paramButton" fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
+    <ion-button class="paramButton" fill="outline" (click)="removeImg()" color="danger">borrar</ion-button>
     }
-    <ion-button expand="full" (click)="confirm()">Submit</ion-button>
+
+    @if(this.nota.position && this.nota.position[1]) {
+    <ion-button class="paramButton" fill="outline" (click)="sendLoc()">Ver Ubicación</ion-button>
+    <ion-button class="paramButton" fill="outline" (click)="removeLoc()" color="danger">borrar</ion-button>
+    }
+    }
+    <ion-button id="submit" size="large" expand="full" (click)="confirm()">Submit</ion-button>
   </form>
 </ion-content>

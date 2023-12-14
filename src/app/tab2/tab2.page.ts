@@ -1,81 +1,130 @@
-import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
+import { LoadingController } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
-import { NoteService } from '../services/note.service';
-import { CommonModule } from '@angular/common';
-import { IonList, IonicModule } from '@ionic/angular';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Note } from '../model/note';
-import { ModalController } from '@ionic/angular';
-import { EditModalComponent } from '../components/edit-modal/edit-modal.component';
+import { NoteService } from '../services/note.service';
 import { UIService } from '../services/ui.service';
-import { Subscription } from 'rxjs';
-import { NoteModalComponent } from '../components/note-modal/note-modal.component';
+import { Camera, CameraResultType } from '@capacitor/camera';
+import { compass, image, star, add } from 'ionicons/icons'
+import { addIcons, } from 'ionicons';
+import { Geolocation } from '@capacitor/geolocation';
+import { ParamModalComponent } from '../components/param-modal/param-modal.component';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonicModule, ExploreContainerComponent, CommonModule]
+  imports: [ExploreContainerComponent, FormsModule, ReactiveFormsModule, IonicModule],
 })
-export class Tab2Page implements OnDestroy {
-  public noteS = inject(NoteService);
-  public modalController = inject(ModalController);
+export class Tab2Page{
+  public form!: FormGroup;
+  private formB = inject(FormBuilder)
+  private noteS = inject(NoteService);
   private UIS = inject(UIService);
-  private suscription!:Subscription;
+  public loadingS = inject(LoadingController);
+  private myLoading!: HTMLIonLoadingElement;
 
-  public notesList:Note[] = [];
+  public imageElement: string = '';
+  public position: number[] = [];
+  public paramSend!:Note;
 
-  @ViewChild('lista') lista!: IonList;
-
-  constructor() { }
-
-  ionViewDidEnter() {
-    this.suscription = this.noteS.readAll().subscribe(value => {
-      if(value){
-        this.notesList = value
-      }  
-    })
+  constructor() {
+    addIcons({ star, image, compass, add, })
+    this.form = this.formB.group({
+      title: ['', [Validators.required, Validators.minLength(4)]],
+      description: [''],
+      datePicker: [new Date(Date.now()).toISOString()]
+    });
   }
 
-  ngOnDestroy(){
-    this.suscription.unsubscribe();
-  }
+  // ionViewWillLeave() {
+  //   this.resetForm();
+  // }
 
-  editNote() {
+  public async saveNote(): Promise<void> {
+    if (!this.form.valid) return;
+    let note: Note = {
+      title: this.form.get("title")?.value,
+      description: this.form.get("description")?.value,
+      date: this.form.get("datePicker")?.value,
+      img: this.imageElement,
+      position: this.position,
+    }
 
-  }
+    await this.UIS.showLoading();
 
-  async deleteNote(note: Note) {
-    if(await this.UIS.confirmation()==='confirm'){
-      try {
-        this.noteS.deleteNote(note);
-        this.lista.closeSlidingItems();
-      } catch {
-  
+    try {
+      await this.noteS.addNote(note);
+      this.resetForm();
+      await this.UIS.showToast("Nota introducida correctamente", "success");
+    } catch (error) {
+      if(this.imageElement.length/1024 >= 1500){
+        await this.UIS.showToast("Tamaño imagen excedido", "danger");
+      }else{
+        await this.UIS.showToast("Error al insertar la nota", "danger");
       }
-    }else{
-      this.lista.closeSlidingItems();
-    }
-    
-  }
-
-  onItemSlide(event: any, note: Note) {
-    const swipeDirection = event.detail.side;
-
-    if (swipeDirection === "start") {
-      this.openModal(note, EditModalComponent);
-      // this.editNote();
-    } else if (swipeDirection === "end") {
-      this.deleteNote(note);
+    } finally {
+      await this.UIS.hideLoading();
     }
   }
 
-  async openModal(note: Note, modalSet:any) {
-    this.UIS.openModal(note, modalSet);
-    this.lista.closeSlidingItems();
+  public takePick = async () => {
+    const image = await Camera.getPhoto({
+      quality: 50,
+      allowEditing: true,
+      resultType: CameraResultType.Base64
+    })
+
+    if (image.base64String) {
+      this.imageElement = image.base64String;
+    }
   }
 
-  viewNote(note:Note){
-    this.openModal(note, NoteModalComponent);
+  private resetForm() {
+    this.form.reset();
+    this.imageElement = '';
+    this.position = [];
+
+    this.form.controls['datePicker'].setValue(new Date(Date.now()).toISOString());
+    // this.form.addControl('datePicker', new Date(Date.now()).toISOString());
   }
+
+  public printCurrentPosition = async () => {
+    const coordinates = (await Geolocation.getCurrentPosition()).coords;
+    this.position = [coordinates.latitude, coordinates.longitude];
+  };
+
+  sendImg(){
+    this.paramSend = {
+      title: this.form.get("title")?.value,
+      date: this.form.get("description")?.value,
+      img: this.imageElement,
+    }
+    this.openModal(ParamModalComponent)
+  }
+
+  sendLoc(){
+    this.paramSend = {
+      title: this.form.get("title")?.value,
+      date: this.form.get("description")?.value,
+      position: this.position,
+    }
+    this.openModal(ParamModalComponent)
+  }
+
+  removeImg(){
+    this.imageElement = '';
+  }
+
+  removeLoc(){
+    this.position = [];
+  }
+
+  async openModal(modalSet:any) {
+    this.UIS.openModal(this.paramSend, modalSet);
+  }
+
 }
