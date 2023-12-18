@@ -1,11 +1,17 @@
-.paramButton {
-    margin-top: 20px;
-    width: 49%;
-}
-
 #submit{
     position: fixed;
     bottom: 0px;
     width: 100%;
     left: 0px;
+}
+
+.paramButton {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.gButtons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 15px;
 }

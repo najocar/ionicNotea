@@ -2,5 +2,11 @@
 
 .paramButton {
     margin-top: 20px;
-    width: 49%;
+    width: 100%;
+}
+
+.gButtons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 15px;
 }

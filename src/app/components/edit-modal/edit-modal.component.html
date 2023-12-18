@@ -21,13 +21,17 @@
     </ion-item>
 
     @if (this.nota.img && this.nota.img !== '') {
-    <ion-button class="paramButton" fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
-    <ion-button class="paramButton" fill="outline" (click)="removeImg()" color="danger">borrar</ion-button>
+    <div class="gButtons">
+      <ion-button class="paramButton" fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
+      <ion-button class="paramButton" fill="outline" (click)="removeImg()" color="danger">borrar</ion-button>
+    </div>
     }
 
     @if(this.nota.position && this.nota.position[1]) {
-    <ion-button class="paramButton" fill="outline" (click)="sendLoc()">Ver Ubicación</ion-button>
-    <ion-button class="paramButton" fill="outline" (click)="removeLoc()" color="danger">borrar</ion-button>
+    <div class="gButtons">
+      <ion-button class="paramButton" fill="outline" (click)="sendLoc()">Ver Ubicación</ion-button>
+      <ion-button class="paramButton" fill="outline" (click)="removeLoc()" color="danger">borrar</ion-button>
+    </div>
     }
     }
     <ion-button id="submit" size="large" expand="full" (click)="confirm()">Submit</ion-button>

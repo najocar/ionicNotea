@@ -42,13 +42,17 @@
     <ion-button type="submit" expand="full" [disabled]="!form.valid">Enviar</ion-button>
 
     @if (this.imageElement !== '') {
-    <ion-button class="paramButton" fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
-    <ion-button class="paramButton" fill="outline" (click)="removeImg()" color="danger">borrar</ion-button>
+    <div class="gButtons">
+      <ion-button class="paramButton" fill="outline" (click)="sendImg()">Ver Imagen</ion-button>
+      <ion-button class="paramButton" fill="outline" (click)="removeImg()" color="danger">borrar</ion-button>
+    </div>
     }
 
     @if(this.position[1]) {
+    <div class="gButtons">
       <ion-button class="paramButton" fill="outline" (click)="sendLoc()">Ver Ubicación</ion-button>
       <ion-button class="paramButton" fill="outline" (click)="removeLoc()" color="danger">borrar</ion-button>
+    </div>
     }
 
     <!-- <ion-fab slot="fixed" vertical="bottom" horizontal="end" style="bottom: 80px;">
