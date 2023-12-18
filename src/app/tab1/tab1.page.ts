@@ -39,6 +39,7 @@ export class Tab1Page implements OnDestroy {
         this.notesList = value
       }  
     })
+    this.lastNote = undefined;
     this.isInfiniteScrollAvailable = true;
     this.platform.ready().then(() => {
       this.notesPerPage=Math.round(this.platform.height()/50);
@@ -59,6 +60,7 @@ export class Tab1Page implements OnDestroy {
       try {
         this.noteS.deleteNote(note);
         this.lista.closeSlidingItems();
+        this._notes$.next([...this._notes$.getValue().filter(item => item !== note),note])
       } catch {
   
       }
