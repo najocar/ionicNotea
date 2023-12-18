@@ -60,7 +60,7 @@ export class Tab1Page implements OnDestroy {
       try {
         this.noteS.deleteNote(note);
         this.lista.closeSlidingItems();
-        this._notes$.next([...this._notes$.getValue().filter(item => item !== note),note])
+        this._notes$.next([...this._notes$.getValue().filter(item => item !== note)])
       } catch {
   
       }
